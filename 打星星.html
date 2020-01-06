@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body{
+            background: linear-gradient(to right, #3c3b3f, #605c3c);
+            /* overflow: hidden; */
+          
+        }
+        .tt{
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        /* border:1px solid black; */
+            /* min-width:800px; */
+
+        }
+        .tt td{
+           float: left;
+            margin-top: 50px;
+            margin-left: 80px;
+            width: 200px;
+            height: 100px;
+            border-radius: 50%;
+            background: #3c3b3f;
+            box-shadow: 0 20px #2b3144 inset;
+
+        }
+        .red {
+            position: relative;
+            margin-top: -57px;
+            margin-left: 25px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            box-shadow: inset -3px -5px 20px rgba(225, 225, 225, 0.8), 
+				        inset -2px -1px 40px rgba(0,0,0,0.5), 0 0 1px #000;	
+
+            background: url(https://media.giphy.com/media/KHOXar40AXG1O/giphy.gif);
+            clip-path: polygon(50% 0%, 68% 24%, 98% 35%, 79% 61%, 79% 91%, 51% 80%, 21% 91%, 18% 62%, 2% 35%, 28% 23%);
+            /* -webkit-clip-path: circle(50% at 50% 50%);
+            clip-path: circle(50% at 50% 50%); */
+            /* background: linear-gradient(to right, #8360c3, #2ebf91); */
+             
+            /* opacity: 0; */    
+            animation: mouse-move 2s ease-in-out infinite;
+
+        }
+        @keyframes mouse-move {
+            50% {
+                margin-top: -180px;
+                opacity: 1;
+            }
+          
+            
+            100% {
+                margin-top: -25px;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+   <div class="tt"> 
+       <table cellspacing="50">
+        <tr>
+            <td><div></div></td>
+            <td><div></div></td>
+            <td><div></div></td>
+        </tr>
+        <tr>
+            <td><div></div></td>
+            <td><div></div></td>
+            <td><div></div></td>
+        </tr>
+        <tr>
+            <td><div></div></td>
+            <td><div></div></td>
+            <td><div></div></td>
+        </tr>
+    </table>
+</div>
+    <input type="button" value="開始遊戲" id="startBtn"><br>
+    目前分數: <span id="scoreText"></span><br>
+    最高分數: <span id="highNameText">沒有人</span> 的分數是 <span id="highScoreText">0</span><br>
+    <script>
+        let score = 0;
+        let scoreText = document.getElementById("scoreText");
+        let sec = document.getElementById("sec");
+        let startBtn = document.getElementById("startBtn");
+        let tds = document.getElementsByTagName("div");
+
+        //設定計時器的變數為0 避免被clearInterval 清掉 才可以重複利用
+        let gameTimer = 0;
+
+        //最高分數那段
+        let high = { name:"", score: 0 };
+        let highNameText = document.getElementById("highNameText");
+        let highScoreText = document.getElementById("highScoreText");
+
+        //  轉文字
+        let highStorage = window.localStorage.getItem("highscore");
+        if(highStorage != null){
+            high = JSON.parse(highStorage);
+            highNameText.innerText = high.name;
+            highScoreText.innerText = high.Score;
+        }
+
+
+
+
+        startBtn.onclick = function(){
+            //開始遊戲標籤停用
+            startBtn.setAttribute("disabled",true);
+            //分數歸零
+            score = 0;
+            scoreText.innerText = score;
+
+            gameTimer = setInterval(game,1000);
+            game();
+
+            setTimeout(() => {
+                clearInterval(gameTimer);
+                for(let div of tds){
+                    div.classList.remove("red");
+                    // td.classList.remove("blue");
+                }
+                alert(`時間到 你得到 ${score}分`);
+                startBtn.removeAttribute("disabled");
+
+
+                //製作最高分那段東西
+                if(score > high.score){
+                    let playerName = prompt("恭喜你得到最高分 請輸入你的名字");
+                    high.name = playerName;
+                    highNameText.innerText = playerName;
+                    high.score = score;
+                    highScoreText.innerText = score;
+                //存最高分在 application/session storage/ 
+                //window.localsStorage.setItem  只能存文字
+                //JASON.stringify 可以將JASON陣列轉成文字
+                window.localStorage.setItem("highscore",JSON.stringify(high));
+                }
+
+                },3000);
+            }
+
+            let game = function(){
+                //tds.forEach(() 單純的陣列
+                //td 值 tds陣列 自訂義
+                for(let div of tds){
+                    div.classList.remove("red");
+                    // td.classList.remove("blue");
+                }
+                for(let i=0;i<3;i++){
+                    let rand = Math.round(Math.random()*8);
+                   //?? floor *9 會只有取兩個??
+                    tds[rand].classList.add("red");
+                }
+            }
+              
+            for(let div of tds){
+                div.onclick = function(){
+                    if(this.classList.contains("red")){
+                        this.classList.remove("red");
+                        // this.classList.add("blue");
+                        score++;
+                        scoreText.innerText = score;
+                    }
+                }
+            }
+    </script>
+</body>
+</html>
